@@ -66,7 +66,6 @@ export class WorkflowStudioComponent implements AfterViewInit, OnDestroy {
     body: `return { output: state.input ?? '' };`,
   };
   private scripts: Record<string, NodeScript> = {};
-  private conditionalEdgeSources = new Set<string>();
 
   constructor(
     private readonly bpmn: BpmnModelerService,

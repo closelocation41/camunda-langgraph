@@ -5,12 +5,14 @@ export type ScriptLanguage = 'typescript' | 'javascript' | 'python';
 export type LangGraphNodeKind =
   | 'start'
   | 'end'
-  | 'agent'
-  | 'tool'
-  | 'router'
-  | 'task'
+  | 'service'
+  | 'script'
+  | 'user'
+  | 'send'
+  | 'receive'
+  | 'timer'
   | 'subgraph'
-  | 'event';
+  | 'task';
 
 export interface SelectedElementInfo {
   id: string;
@@ -33,6 +35,7 @@ export interface LangGraphNode {
   kind: LangGraphNodeKind;
   functionName: string;
   annotationId: string;
+  variables: string[];
 }
 
 export interface LangGraphEdge {
@@ -40,13 +43,20 @@ export interface LangGraphEdge {
   target: string;
   condition?: string;
   label?: string;
+  gatewayId?: string;
+  gatewayType?: string;
+  isConditional?: boolean;
+  isLoop?: boolean;
 }
 
 export interface LangGraphWorkflow {
   id: string;
   name: string;
+  symbolScope: string;
   entry: string | null;
   finish: string[];
   nodes: LangGraphNode[];
   edges: LangGraphEdge[];
+  subgraphs: Record<string, LangGraphWorkflow>;
+  variables: string[];
 }
