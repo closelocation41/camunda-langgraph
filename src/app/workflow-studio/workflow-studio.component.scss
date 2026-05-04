@@ -1,0 +1,260 @@
+:host {
+  display: block;
+  height: 100vh;
+  overflow: hidden;
+  background:
+    linear-gradient(180deg, rgba(255,255,255,0.78), rgba(238,243,248,0.94)),
+    #eef3f8;
+}
+
+.topbar {
+  height: 72px;
+  padding: 0 18px;
+  justify-content: space-between;
+  background: rgba(255, 255, 255, 0.94);
+  border-bottom: 1px solid #d9e1ec;
+  color: #172033;
+}
+
+.brand {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  min-width: 0;
+}
+
+.brand-mark {
+  display: grid;
+  place-items: center;
+  width: 42px;
+  height: 42px;
+  border-radius: 8px;
+  background: #244d8f;
+  color: #ffffff;
+  font-weight: 800;
+  letter-spacing: 0;
+}
+
+h1,
+h2,
+p {
+  margin: 0;
+}
+
+h1 {
+  font-size: 1.08rem;
+  font-weight: 800;
+  line-height: 1.2;
+}
+
+.brand p {
+  margin-top: 2px;
+  color: #607089;
+  font-size: 0.82rem;
+}
+
+.toolbar-actions,
+.generator-actions,
+.code-actions {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  min-width: 0;
+}
+
+.hidden-input {
+  display: none;
+}
+
+.studio-grid {
+  height: calc(100vh - 112px);
+  display: grid;
+  grid-template-columns: minmax(480px, 1.35fr) minmax(320px, 0.82fr) minmax(420px, 1fr);
+  gap: 14px;
+  padding: 14px;
+  min-height: 0;
+}
+
+.workflow-section,
+.properties-section,
+.coding-section {
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+  background: #ffffff;
+  border: 1px solid #d9e1ec;
+  border-radius: 8px;
+  box-shadow: 0 14px 32px rgba(31, 45, 61, 0.08);
+  overflow: hidden;
+}
+
+.section-header {
+  min-height: 72px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  padding: 14px 16px;
+  border-bottom: 1px solid #e4e9f1;
+  background: #fbfcfe;
+}
+
+.section-header.compact {
+  min-height: 66px;
+}
+
+.eyebrow {
+  display: block;
+  color: #607089;
+  font-size: 0.72rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+}
+
+h2 {
+  margin-top: 3px;
+  color: #172033;
+  font-size: 1rem;
+  font-weight: 800;
+  line-height: 1.25;
+}
+
+.bpmn-host {
+  flex: 1;
+  min-height: 0;
+  background:
+    linear-gradient(#f7f9fc 1px, transparent 1px),
+    linear-gradient(90deg, #f7f9fc 1px, transparent 1px),
+    #ffffff;
+  background-size: 24px 24px;
+}
+
+mat-tab-group {
+  flex: 1;
+  min-height: 0;
+}
+
+:host ::ng-deep .mat-mdc-tab-body-wrapper {
+  flex: 1;
+  min-height: 0;
+}
+
+.panel-pad {
+  height: 100%;
+  overflow: auto;
+  padding: 16px;
+}
+
+mat-form-field {
+  width: 100%;
+}
+
+.body-field textarea {
+  min-height: 210px;
+  resize: vertical;
+}
+
+.empty-state {
+  min-height: 220px;
+  display: grid;
+  place-items: center;
+  gap: 10px;
+  color: #607089;
+  text-align: center;
+  line-height: 1.45;
+}
+
+.empty-state mat-icon {
+  width: 46px;
+  height: 46px;
+  font-size: 46px;
+  color: #2f6fbb;
+}
+
+.camunda-properties {
+  height: calc(100vh - 208px);
+  overflow: auto;
+  background: #ffffff;
+}
+
+.generator-actions {
+  padding: 12px 16px;
+  border-bottom: 1px solid #e4e9f1;
+}
+
+.code-output {
+  flex: 1;
+  min-height: 0;
+  margin: 0;
+  padding: 18px;
+  overflow: auto;
+  background: #101827;
+  color: #eef5ff;
+  font-size: 0.82rem;
+  line-height: 1.58;
+  white-space: pre-wrap;
+}
+
+.statusbar {
+  height: 40px;
+  display: flex;
+  align-items: center;
+  padding: 0 18px;
+  border-top: 1px solid #d9e1ec;
+  background: #ffffff;
+  color: #607089;
+  font-size: 0.84rem;
+}
+
+button mat-icon {
+  margin-right: 6px;
+}
+
+@media (max-width: 1280px) {
+  :host {
+    height: auto;
+    min-height: 100vh;
+    overflow: auto;
+  }
+
+  .studio-grid {
+    height: auto;
+    grid-template-columns: 1fr;
+  }
+
+  .workflow-section,
+  .properties-section,
+  .coding-section {
+    min-height: 520px;
+  }
+
+  .bpmn-host {
+    min-height: 440px;
+  }
+}
+
+@media (max-width: 760px) {
+  .topbar {
+    height: auto;
+    min-height: 96px;
+    align-items: flex-start;
+    flex-direction: column;
+    padding: 12px;
+  }
+
+  .toolbar-actions,
+  .generator-actions,
+  .code-actions {
+    flex-wrap: wrap;
+  }
+
+  .studio-grid {
+    padding: 10px;
+  }
+
+  .section-header {
+    align-items: flex-start;
+    flex-direction: column;
+  }
+}

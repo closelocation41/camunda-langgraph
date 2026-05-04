@@ -1,0 +1,43 @@
+@import 'highlight.js/styles/github-dark.css';
+
+html,
+body {
+  height: 100%;
+  margin: 0;
+}
+
+body {
+  background: #eef3f8;
+  color: #182230;
+  font-family: Inter, Roboto, Arial, sans-serif;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+.bpmn-host .djs-palette {
+  border-radius: 8px;
+  border-color: #d0d7e2;
+  box-shadow: 0 10px 24px rgba(18, 32, 51, 0.12);
+}
+
+.bpmn-host .bjs-powered-by {
+  display: none;
+}
+
+.bio-properties-panel {
+  --color-blue-205-100-45: #2563eb;
+  border: 0;
+  font-family: Inter, Roboto, Arial, sans-serif;
+}
+
+.bio-properties-panel-scroll-container {
+  max-height: calc(100vh - 268px);
+}
+
+pre,
+code,
+textarea {
+  font-family: "Cascadia Code", "Fira Code", Consolas, monospace;
+}

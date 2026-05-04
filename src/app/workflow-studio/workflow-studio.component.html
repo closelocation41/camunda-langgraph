@@ -1,0 +1,151 @@
+<mat-toolbar class="topbar">
+  <div class="brand">
+    <span class="brand-mark">LG</span>
+    <div>
+      <h1>Camunda LangGraph Studio</h1>
+      <p>BPMN XML to agentic AI workflow code</p>
+    </div>
+  </div>
+
+  <div class="toolbar-actions">
+    <button mat-stroked-button type="button" (click)="openFile()">
+      <mat-icon>folder_open</mat-icon>
+      Open XML
+    </button>
+    <button mat-stroked-button type="button" (click)="clear()">
+      <mat-icon>delete_sweep</mat-icon>
+      Clear
+    </button>
+    <button mat-flat-button color="primary" type="button" (click)="exportXml()">
+      <mat-icon>download</mat-icon>
+      Export XML
+    </button>
+  </div>
+</mat-toolbar>
+
+<input #fileInput class="hidden-input" type="file" accept=".bpmn,.xml" (change)="importFile($event)">
+
+<main class="studio-grid">
+  <section class="workflow-section">
+    <header class="section-header">
+      <div>
+        <span class="eyebrow">Workflow Design</span>
+        <h2>Camunda BPMN modeler</h2>
+      </div>
+      <mat-chip-set>
+        <mat-chip>XML source</mat-chip>
+        <mat-chip>BPMN 2.0</mat-chip>
+      </mat-chip-set>
+    </header>
+    <div #bpmnCanvas class="bpmn-host"></div>
+  </section>
+
+  <aside class="properties-section">
+    <header class="section-header compact">
+      <div>
+        <span class="eyebrow">Properties</span>
+        <h2>{{ selectedSummary }}</h2>
+      </div>
+    </header>
+
+    <mat-tab-group animationDuration="180ms">
+      <mat-tab label="Element">
+        <div class="panel-pad">
+          <ng-container *ngIf="selectedElement; else noSelection">
+            <mat-form-field appearance="outline">
+              <mat-label>Annotation ID</mat-label>
+              <input matInput [ngModel]="selectedElement.id" (blur)="updateElementId($any($event.target).value)">
+            </mat-form-field>
+
+            <mat-form-field appearance="outline">
+              <mat-label>Name</mat-label>
+              <input matInput [ngModel]="selectedElement.name" (ngModelChange)="updateElementName($event)">
+            </mat-form-field>
+
+            <mat-form-field appearance="outline">
+              <mat-label>BPMN type</mat-label>
+              <input matInput [value]="selectedElement.type" disabled>
+            </mat-form-field>
+          </ng-container>
+          <ng-template #noSelection>
+            <div class="empty-state">
+              <mat-icon>ads_click</mat-icon>
+              <span>Select a BPMN shape to edit LangGraph metadata and node code.</span>
+            </div>
+          </ng-template>
+        </div>
+      </mat-tab>
+
+      <mat-tab label="Code">
+        <div class="panel-pad">
+          <mat-form-field appearance="outline">
+            <mat-label>Function language</mat-label>
+            <mat-select [(ngModel)]="scriptLanguage" (ngModelChange)="changeScriptLanguage($event)">
+              <mat-option value="typescript">TypeScript</mat-option>
+              <mat-option value="javascript">JavaScript</mat-option>
+              <mat-option value="python">Python</mat-option>
+            </mat-select>
+          </mat-form-field>
+
+          <mat-form-field appearance="outline">
+            <mat-label>Function name</mat-label>
+            <input matInput [(ngModel)]="currentScript.functionName" [disabled]="!selectedElement">
+          </mat-form-field>
+
+          <mat-form-field appearance="outline">
+            <mat-label>Arguments</mat-label>
+            <input matInput [(ngModel)]="currentScript.args" [disabled]="!selectedElement">
+          </mat-form-field>
+
+          <mat-form-field appearance="outline" class="body-field">
+            <mat-label>Function body</mat-label>
+            <textarea matInput rows="12" [(ngModel)]="currentScript.body" [disabled]="!selectedElement"></textarea>
+          </mat-form-field>
+        </div>
+      </mat-tab>
+
+      <mat-tab label="Camunda">
+        <div #camundaProperties class="camunda-properties"></div>
+      </mat-tab>
+    </mat-tab-group>
+  </aside>
+
+  <section class="coding-section">
+    <header class="section-header">
+      <div>
+        <span class="eyebrow">Coding</span>
+        <h2>LangGraph generator</h2>
+      </div>
+      <div class="code-actions">
+        <mat-button-toggle-group [(ngModel)]="outputLanguage" (ngModelChange)="generate()" aria-label="Output language">
+          <mat-button-toggle value="typescript">TS</mat-button-toggle>
+          <mat-button-toggle value="javascript">JS</mat-button-toggle>
+          <mat-button-toggle value="python">PY</mat-button-toggle>
+          <mat-button-toggle value="json">JSON</mat-button-toggle>
+          <mat-button-toggle value="xml">XML</mat-button-toggle>
+        </mat-button-toggle-group>
+      </div>
+    </header>
+
+    <div class="generator-actions">
+      <button mat-flat-button color="primary" type="button" (click)="generate()">
+        <mat-icon>auto_fix_high</mat-icon>
+        Convert
+      </button>
+      <button mat-stroked-button type="button" (click)="exportOutput()">
+        <mat-icon>file_download</mat-icon>
+        Export Code
+      </button>
+      <button mat-stroked-button type="button" (click)="clearOutput()">
+        <mat-icon>backspace</mat-icon>
+        Clear
+      </button>
+    </div>
+
+    <pre class="code-output"><code [innerHTML]="highlightedOutput || 'Click Convert to generate LangGraph workflow code.'"></code></pre>
+  </section>
+</main>
+
+<footer class="statusbar">
+  <span>{{ status }}</span>
+</footer>
