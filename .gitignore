@@ -31,3 +31,5 @@ coverage/
 .angular/
 .nyc_output/
 .cache/
+/.angular/
+.angular
