@@ -57,6 +57,10 @@ export class WorkflowStudioComponent implements AfterViewInit, OnDestroy {
   outputLanguage: CodeLanguage = 'typescript';
   scriptLanguage: ScriptLanguage = 'typescript';
   status = 'Ready';
+  isWorkflowMaximized = false;
+  isPropertiesCollapsed = false;
+  isCodingCollapsed = false;
+  isChatMaximized = false;
   selectedElement: SelectedElementInfo | null = null;
   currentScript: NodeScript = {
     language: 'typescript',
@@ -146,6 +150,31 @@ export class WorkflowStudioComponent implements AfterViewInit, OnDestroy {
   clearOutput(): void {
     this.output = '';
     this.showStatus('Generated code cleared');
+  }
+
+  async copyOutput(): Promise<void> {
+    const content = this.output || this.renderOutput();
+    await navigator.clipboard.writeText(content);
+    this.showStatus('Copied');
+  }
+
+  toggleWorkflowMaximized(): void {
+    this.isWorkflowMaximized = !this.isWorkflowMaximized;
+    this.scheduleModelerResize();
+  }
+
+  togglePropertiesCollapsed(): void {
+    this.isPropertiesCollapsed = !this.isPropertiesCollapsed;
+    this.scheduleModelerResize();
+  }
+
+  toggleCodingCollapsed(): void {
+    this.isCodingCollapsed = !this.isCodingCollapsed;
+    this.scheduleModelerResize();
+  }
+
+  toggleChatMaximized(): void {
+    this.isChatMaximized = !this.isChatMaximized;
   }
 
   exportOutput(): void {
@@ -249,6 +278,12 @@ export class WorkflowStudioComponent implements AfterViewInit, OnDestroy {
       this.selectedElement.name,
       this.scriptLanguage,
     );
+  }
+
+  private scheduleModelerResize(): void {
+    window.requestAnimationFrame(() => {
+      window.requestAnimationFrame(() => this.bpmn.resize());
+    });
   }
 
   private download(content: string, filename: string, mimeType: string): void {

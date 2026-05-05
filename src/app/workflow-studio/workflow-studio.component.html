@@ -25,90 +25,164 @@
 
 <input #fileInput class="hidden-input" type="file" accept=".bpmn,.xml" (change)="importFile($event)">
 
-<main class="studio-grid">
+<main
+  class="studio-grid"
+  [class.workflow-maximized]="isWorkflowMaximized"
+  [class.properties-collapsed]="isPropertiesCollapsed"
+  [class.coding-collapsed]="isCodingCollapsed"
+>
   <section class="workflow-section">
     <header class="section-header">
       <div>
         <span class="eyebrow">Workflow Design</span>
         <h2>Camunda BPMN modeler</h2>
       </div>
-      <mat-chip-set>
-        <mat-chip>XML source</mat-chip>
-        <mat-chip>BPMN 2.0</mat-chip>
-      </mat-chip-set>
+      <div class="header-actions">
+        <mat-chip-set>
+          <mat-chip>XML source</mat-chip>
+          <mat-chip>BPMN 2.0</mat-chip>
+        </mat-chip-set>
+        <button
+          mat-icon-button
+          type="button"
+          [attr.aria-label]="isWorkflowMaximized ? 'Minimize workflow designer' : 'Maximize workflow designer'"
+          (click)="toggleWorkflowMaximized()"
+        >
+          <mat-icon>{{ isWorkflowMaximized ? 'close_fullscreen' : 'open_in_full' }}</mat-icon>
+        </button>
+      </div>
     </header>
     <div #bpmnCanvas class="bpmn-host"></div>
   </section>
 
-  <aside class="properties-section">
-    <header class="section-header compact">
-      <div>
-        <span class="eyebrow">Properties</span>
-        <h2>{{ selectedSummary }}</h2>
+  <div class="inspector-stack" [class.chat-maximized]="isChatMaximized">
+    <aside class="properties-section">
+      <header class="section-header compact">
+        <div>
+          <span class="eyebrow">Properties</span>
+          <h2>{{ selectedSummary }}</h2>
+        </div>
+        <button
+          mat-icon-button
+          type="button"
+          [attr.aria-label]="isPropertiesCollapsed ? 'Expand properties panel' : 'Collapse properties panel'"
+          (click)="togglePropertiesCollapsed()"
+        >
+          <mat-icon>{{ isPropertiesCollapsed ? 'keyboard_double_arrow_left' : 'keyboard_double_arrow_right' }}</mat-icon>
+        </button>
+      </header>
+
+      <div class="collapsed-rail" *ngIf="isPropertiesCollapsed">
+        <button mat-icon-button type="button" aria-label="Expand properties panel" (click)="togglePropertiesCollapsed()">
+          <mat-icon>tune</mat-icon>
+        </button>
+        <span>Properties</span>
       </div>
-    </header>
 
-    <mat-tab-group animationDuration="180ms">
-      <mat-tab label="Element">
-        <div class="panel-pad">
-          <ng-container *ngIf="selectedElement; else noSelection">
+      <mat-tab-group [class.panel-hidden]="isPropertiesCollapsed" animationDuration="180ms">
+        <mat-tab label="Element">
+          <div class="panel-pad">
+            <ng-container *ngIf="selectedElement; else noSelection">
+              <mat-form-field appearance="outline">
+                <mat-label>Annotation ID</mat-label>
+                <input matInput [ngModel]="selectedElement.id" (blur)="updateElementId($any($event.target).value)">
+              </mat-form-field>
+
+              <mat-form-field appearance="outline">
+                <mat-label>Name</mat-label>
+                <input matInput [ngModel]="selectedElement.name" (ngModelChange)="updateElementName($event)">
+              </mat-form-field>
+
+              <mat-form-field appearance="outline">
+                <mat-label>BPMN type</mat-label>
+                <input matInput [value]="selectedElement.type" disabled>
+              </mat-form-field>
+            </ng-container>
+            <ng-template #noSelection>
+              <div class="empty-state">
+                <mat-icon>ads_click</mat-icon>
+                <span>Select a BPMN shape to edit LangGraph metadata and node code.</span>
+              </div>
+            </ng-template>
+          </div>
+        </mat-tab>
+
+        <mat-tab label="Code">
+          <div class="panel-pad">
             <mat-form-field appearance="outline">
-              <mat-label>Annotation ID</mat-label>
-              <input matInput [ngModel]="selectedElement.id" (blur)="updateElementId($any($event.target).value)">
+              <mat-label>Function language</mat-label>
+              <mat-select [(ngModel)]="scriptLanguage" (ngModelChange)="changeScriptLanguage($event)">
+                <mat-option value="typescript">TypeScript</mat-option>
+                <mat-option value="javascript">JavaScript</mat-option>
+                <mat-option value="python">Python</mat-option>
+              </mat-select>
             </mat-form-field>
 
             <mat-form-field appearance="outline">
-              <mat-label>Name</mat-label>
-              <input matInput [ngModel]="selectedElement.name" (ngModelChange)="updateElementName($event)">
+              <mat-label>Function name</mat-label>
+              <input matInput [(ngModel)]="currentScript.functionName" [disabled]="!selectedElement">
             </mat-form-field>
 
             <mat-form-field appearance="outline">
-              <mat-label>BPMN type</mat-label>
-              <input matInput [value]="selectedElement.type" disabled>
+              <mat-label>Arguments</mat-label>
+              <input matInput [(ngModel)]="currentScript.args" [disabled]="!selectedElement">
             </mat-form-field>
-          </ng-container>
-          <ng-template #noSelection>
-            <div class="empty-state">
-              <mat-icon>ads_click</mat-icon>
-              <span>Select a BPMN shape to edit LangGraph metadata and node code.</span>
-            </div>
-          </ng-template>
+
+            <mat-form-field appearance="outline" class="body-field">
+              <mat-label>Function body</mat-label>
+              <textarea matInput rows="12" [(ngModel)]="currentScript.body" [disabled]="!selectedElement"></textarea>
+            </mat-form-field>
+          </div>
+        </mat-tab>
+
+        <mat-tab label="Camunda">
+          <div #camundaProperties class="camunda-properties"></div>
+        </mat-tab>
+      </mat-tab-group>
+    </aside>
+
+    <section class="chat-section">
+      <header class="section-header compact">
+        <div>
+          <span class="eyebrow">Workflow Chat</span>
+          <h2>Agentic workflow assistant</h2>
         </div>
-      </mat-tab>
-
-      <mat-tab label="Code">
-        <div class="panel-pad">
-          <mat-form-field appearance="outline">
-            <mat-label>Function language</mat-label>
-            <mat-select [(ngModel)]="scriptLanguage" (ngModelChange)="changeScriptLanguage($event)">
-              <mat-option value="typescript">TypeScript</mat-option>
-              <mat-option value="javascript">JavaScript</mat-option>
-              <mat-option value="python">Python</mat-option>
-            </mat-select>
-          </mat-form-field>
-
-          <mat-form-field appearance="outline">
-            <mat-label>Function name</mat-label>
-            <input matInput [(ngModel)]="currentScript.functionName" [disabled]="!selectedElement">
-          </mat-form-field>
-
-          <mat-form-field appearance="outline">
-            <mat-label>Arguments</mat-label>
-            <input matInput [(ngModel)]="currentScript.args" [disabled]="!selectedElement">
-          </mat-form-field>
-
-          <mat-form-field appearance="outline" class="body-field">
-            <mat-label>Function body</mat-label>
-            <textarea matInput rows="12" [(ngModel)]="currentScript.body" [disabled]="!selectedElement"></textarea>
-          </mat-form-field>
+        <div class="header-actions">
+          <mat-icon>forum</mat-icon>
+          <button
+            mat-icon-button
+            type="button"
+            [attr.aria-label]="isChatMaximized ? 'Minimize chat panel height' : 'Maximize chat panel height'"
+            (click)="toggleChatMaximized()"
+          >
+            <mat-icon>{{ isChatMaximized ? 'unfold_less' : 'unfold_more' }}</mat-icon>
+          </button>
         </div>
-      </mat-tab>
+      </header>
 
-      <mat-tab label="Camunda">
-        <div #camundaProperties class="camunda-properties"></div>
-      </mat-tab>
-    </mat-tab-group>
-  </aside>
+      <div class="chat-body">
+        <div class="chat-message assistant">
+          <span class="chat-role">LLM</span>
+          <p>Describe the workflow you want to create. Agentic workflow generation will connect here next.</p>
+        </div>
+        <div class="chat-message user">
+          <span class="chat-role">You</span>
+          <p>Create approval flow with retry, audit log, and notification.</p>
+        </div>
+      </div>
+
+      <div class="chat-composer">
+        <mat-form-field appearance="outline">
+          <mat-label>Ask workflow assistant</mat-label>
+          <textarea matInput rows="3" disabled placeholder="Chat design placeholder"></textarea>
+        </mat-form-field>
+        <button mat-flat-button color="primary" type="button" disabled>
+          <mat-icon>send</mat-icon>
+          Send
+        </button>
+      </div>
+    </section>
+  </div>
 
   <section class="coding-section">
     <header class="section-header">
@@ -124,9 +198,28 @@
           <mat-button-toggle value="json">JSON</mat-button-toggle>
           <mat-button-toggle value="xml">XML</mat-button-toggle>
         </mat-button-toggle-group>
+        <button mat-icon-button type="button" aria-label="Copy generated code" (click)="copyOutput()">
+          <mat-icon>content_copy</mat-icon>
+        </button>
+        <button
+          mat-icon-button
+          type="button"
+          [attr.aria-label]="isCodingCollapsed ? 'Expand coding panel' : 'Collapse coding panel'"
+          (click)="toggleCodingCollapsed()"
+        >
+          <mat-icon>{{ isCodingCollapsed ? 'keyboard_double_arrow_left' : 'keyboard_double_arrow_right' }}</mat-icon>
+        </button>
       </div>
     </header>
 
+    <div class="collapsed-rail" *ngIf="isCodingCollapsed">
+      <button mat-icon-button type="button" aria-label="Expand coding panel" (click)="toggleCodingCollapsed()">
+        <mat-icon>code</mat-icon>
+      </button>
+      <span>Coding</span>
+    </div>
+
+    <ng-container *ngIf="!isCodingCollapsed">
     <div class="generator-actions">
       <button mat-flat-button color="primary" type="button" (click)="generate()">
         <mat-icon>auto_fix_high</mat-icon>
@@ -143,6 +236,7 @@
     </div>
 
     <pre class="code-output"><code [innerHTML]="highlightedOutput || 'Click Convert to generate LangGraph workflow code.'"></code></pre>
+    </ng-container>
   </section>
 </main>
 

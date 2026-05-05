@@ -383,6 +383,15 @@ export class BpmnModelerService {
     modeling.updateProperties(element, props);
   }
 
+  resize(): void {
+    if (!this.modeler) {
+      return;
+    }
+
+    const canvas = this.modeler.get('canvas') as { resized(): void };
+    canvas.resized();
+  }
+
   destroy(): void {
     this.modeler?.destroy();
     this.modeler = null;
